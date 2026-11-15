@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Th Card Maker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #2b2b3a 0%, #1a1a28 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== CONTROLES ===== */
+        .controls {
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 24px 22px;
+            width: 340px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 215, 100, 0.2);
+            color: #f0e9d8;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .controls::-webkit-scrollbar { width: 6px; }
+        .controls::-webkit-scrollbar-thumb { background: #ffdb7c; border-radius: 6px; }
+
+        .controls h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffdb7c;
+            text-shadow: 0 2px 5px #b8860b;
+            border-bottom: 2px solid #ffdb7c55;
+            padding-bottom: 12px;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group > label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #c9b77b;
+            text-transform: uppercase;
+        }
+
+        .control-group input[type="file"],
+        .control-group input[type="text"] {
+            background: #2f2f3f;
+            border: 1px dashed #ffdb7c88;
+            border-radius: 14px;
+            padding: 11px 12px;
+            color: #ddd;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .control-group input[type="text"] { border: 1px solid #4a4a60; }
+
+        .control-group input[type="text"]:focus {
+            outline: none;
+            border-color: #ffdb7c;
+            box-shadow: 0 0 0 3px #ffdb7c33;
+        }
+
+        .control-group input[type="file"] { cursor: pointer; font-size: 0.8rem; }
+        .control-group input[type="file"]:hover { border-color: #ffdb7c; background: #3a3a50; }
+
+        .control-group textarea {
+            background: #242433;
+            border: 1px solid #4a4a60;
+            border-radius: 14px;
+            padding: 11px 13px;
+            color: #fff;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 90px;
+            font-family: inherit;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .control-group textarea:focus {
+            outline: none;
+            border-color: #ffdb7c;
+            box-shadow: 0 0 0 3px #ffdb7c33;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: #ffdb7c;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            font-size: 0.75rem;
+            color: #ffdb7c;
+            min-width: 38px;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #2f2f3f;
+            border-radius: 14px;
+            padding: 8px 12px;
+            border: 1px solid #4a4a60;
+        }
+
+        .color-row label {
+            flex: 1;
+            font-size: 0.8rem;
+            color: #c9b77b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .color-row input[type="color"] {
+            width: 42px;
+            height: 32px;
+            border: 2px solid #ffdb7c88;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+        .color-row input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
+
+        .btn {
+            background: linear-gradient(145deg, #f3cf7a, #d4a537);
+            border: none;
+            border-radius: 40px;
+            padding: 13px 16px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #1e1e2a;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 6px 0 #8b6914, 0 8px 18px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #8b6914, 0 5px 10px rgba(0, 0, 0, 0.4); }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #ffdb7c;
+            color: #ffdb7c;
+            box-shadow: none;
+        }
+
+        .btn-outline:active { transform: translateY(2px); background: #ffdb7c22; }
+
+        .btn-small { padding: 8px 12px; font-size: 0.75rem; }
+
+        .btn-danger {
+            background: linear-gradient(145deg, #e05252, #b22222);
+            box-shadow: 0 6px 0 #7a1010, 0 8px 18px rgba(0, 0, 0, 0.4);
+            color: #fff;
+        }
+
+        .btn-danger:active { box-shadow: 0 2px 0 #7a1010, 0 5px 10px rgba(0, 0, 0, 0.4); }
+
+        .info-tip {
+            font-size: 0.72rem;
+            color: #a09070;
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .divider { height: 1px; background: #ffdb7c33; margin: 14px 0; }
+
+        .subsection {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            padding: 10px 12px;
+            margin-top: 4px;
+            border: 1px solid #4a4a6055;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .subsection-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #ffdb7c;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+
+        /* Destaque para qualquer elemento selecionado */
+        .element-selected {
+            outline: 2px dashed #ffdb7c !important;
+            outline-offset: 2px;
+        }
+
+        /* ===== CARTA ===== */
+        .card-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-container {
+            width: 380px;
+            height: 560px;
+            background: #13131c;
+            border-radius: 28px;
+            box-shadow: 0 30px 45px -15px black, 0 0 0 2px #ffdb7c55, 0 0 0 6px #07070c;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tcg-card {
+            --card-border: #ffdb7c;
+            --card-title-color: #ffdb7c;
+            --card-title-bg: #2a2416;
+            --card-title-bg-light: #3a3018;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid var(--card-border);
+            box-shadow: inset 0 0 30px #00000088;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            border-radius: 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-shadow: inset 0 0 15px #000000;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            min-height: 0;
+            pointer-events: none;
+        }
+
+        .bg-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+        }
+
+        .card-content-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .card-name-bar {
+            background: linear-gradient(90deg,
+                var(--card-title-bg, #2a2416),
+                var(--card-title-bg-light, #3a3018),
+                var(--card-title-bg, #2a2416));
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 3px 8px #00000088, inset 0 1px 0 #ffdb7c33;
+            flex-shrink: 0;
+            z-index: 10;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .card-name-bar h3 {
+            color: var(--card-title-color, var(--card-border));
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-align: center;
+            text-transform: uppercase;
+            text-shadow: 0 1px 3px #000;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .image-frame-wrapper {
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #2a2a36;
+            border-radius: 14px;
+            border: 2px solid var(--card-border);
+            box-shadow: 0 6px 12px #00000066;
+            height: 200px;
+            overflow: hidden;
+            z-index: 10;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .card-image-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .card-image-area img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            transform-origin: center center;
+            user-select: none;
+            -webkit-user-drag: none;
+            transition: transform 0.05s linear;
+        }
+
+        .image-placeholder {
+            color: #6b6b84;
+            font-size: 2.2rem;
+            font-weight: 300;
+            user-select: none;
+            text-align: center;
+            line-height: 1.2;
+            padding: 10px;
+        }
+
+        /* Alças de redimensionamento */
+        .resize-handle {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #ffdb7c;
+            border: 2px solid #1e1e2a;
+            border-radius: 50%;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: auto;
+            touch-action: none;
+        }
+
+        .free-text-box:hover .resize-handle,
+        .free-text-box.selected .resize-handle,
+        .card-description:hover .resize-handle,
+        .card-description.selected .resize-handle {
+            opacity: 1;
+        }
+
+        .resize-handle.se { bottom: -8px; right: -8px; cursor: nwse-resize; }
+        .resize-handle.e { right: -8px; top: 50%; transform: translateY(-50%); cursor: ew-resize; width: 12px; height: 12px; }
+        .resize-handle.s { bottom: -8px; left: 50%; transform: translateX(-50%); cursor: ns-resize; width: 12px; height: 12px; }
+
+        /* ===== DESCRIÇÃO ===== */
+        .card-description {
+            position: absolute;
+            background: #0e0e14;
+            backdrop-filter: blur(2px);
+            border-radius: 10px;
+            padding: 8px 10px;
+            color: #eae3d0;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            min-height: 42px;
+            min-width: 100px;
+            max-width: 100%;
+            height: auto;
+            overflow: hidden;
+            text-align: left;
+            border: 1px solid var(--card-border);
+            box-shadow: inset 0 0 10px black, 0 2px 8px #00000055;
+            cursor: move;
+            user-select: none;
+            z-index: 20;
+            pointer-events: auto;
+            touch-action: none;
+        }
+
+        .desc-text {
+            display: block;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .card-description.selected {
+            border: 2px solid #ffdb7c;
+            box-shadow: 0 0 12px #ffdb7c88, inset 0 0 10px black;
+            z-index: 100;
+        }
+
+        /* Camada das caixas livres */
+        .free-text-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .free-text-box {
+            position: absolute;
+            background: #ffdb7c22;
+            border: 1px dashed #ffdb7c;
+            border-radius: 8px;
+            padding: 4px 8px;
+            min-width: 40px;
+            min-height: 26px;
+            color: #fff3d1;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: move;
+            pointer-events: auto;
+            user-select: none;
+            box-shadow: 0 2px 8px #00000055;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+            z-index: 10;
+            transition: border 0.1s, background 0.1s;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* Estilos para Ícones */
+        .free-text-box.is-icon {
+            background: transparent !important;
+            border: 1px dashed transparent !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            padding: 0 !important;
+            font-size: 32px !important;
+            line-height: 1;
+        }
+        .free-text-box.is-icon:hover, .free-text-box.is-icon.selected {
+            border: 1px dashed #ffdb7c !important;
+        }
+        
+        .free-text-box.is-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .free-text-box.selected {
+            border: 2px solid #ffdb7c;
+            background: #ffdb7c44;
+            box-shadow: 0 0 12px #ffdb7c88;
+        }
+
+        .free-text-box .delete-handle,
+        .card-description .delete-handle {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #b22222;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            line-height: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #fff;
+            z-index: 300;
+            font-weight: bold;
+            touch-action: none;
+        }
+
+        .free-text-box:hover .delete-handle,
+        .free-text-box.selected .delete-handle,
+        .card-description:hover .delete-handle,
+        .card-description.selected .delete-handle {
+            display: block;
+        }
+
+        .card-description .resize-handle {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #ffdb7c;
+            border: 2px solid #1e1e2a;
+            border-radius: 50%;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: auto;
+        }
+
+        .preview-toggle {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            z-index: 999;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: #ffdb7c;
+            color: #1e1e2a;
+            font-size: 1rem;
+            font-weight: 700;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ==================================================== */
+        /* ================= DISPOSITIVOS MÓVEIS ============= */
+        /* ==================================================== */
+
+        /* ==== RETRATO (EM PÉ) ==== */
+        @media (max-width: 850px) and (orientation: portrait) {
+            body {
+                flex-direction: column;
+                align-items: center;
+                padding: 0 8px 70px;
+                gap: 12px;
+            }
+
+            .card-wrapper {
+                position: sticky;
+                top: 0;
+                z-index: 900;
+                width: calc(100% + 16px);
+                margin: 0 -8px;
+                padding: 8px 0 0;
+                background: rgba(22, 22, 34, 0.96);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(255, 219, 124, 0.25);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+                display: flex;
+                justify-content: center;
+                overflow: hidden;
+            }
+
+            .card-container {
+                transform: scale(0.6);
+                transform-origin: center top;
+                margin-bottom: -224px; /* Compensa a escala no layout */
+            }
+
+            .card-wrapper.mini .card-container {
+                transform: scale(0.34);
+                margin-bottom: -370px;
+            }
+
+            .controls {
+                width: 100%;
+                max-width: 480px;
+                max-height: none;
+                overflow: visible;
+                border-radius: 22px;
+            }
+
+            .preview-toggle { display: flex; }
+
+            .resize-handle { width: 20px; height: 20px; }
+            .resize-handle.se { bottom: -10px; right: -10px; }
+            .resize-handle.e { right: -10px; width: 16px; height: 16px; }
+            .resize-handle.s { bottom: -10px; width: 16px; height: 16px; }
+
+            .free-text-box .delete-handle,
+            .card-description .delete-handle {
+                width: 24px;
+                height: 24px;
+                line-height: 20px;
+                font-size: 14px;
+                top: -10px;
+                right: -10px;
+            }
+        }
+
+        /* ==== PAISAGEM (DEITADO) - ESTILO PC ==== */
+        @media (orientation: landscape) and (max-height: 600px) {
+            body {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: stretch;
+                padding: 10px;
+                gap: 15px;
+                height: 100vh;
+                overflow: hidden; /* Não deixa o body rolar */
+                justify-content: flex-start;
+            }
+
+            .controls {
+                width: 340px;
+                max-height: 100%;
+                overflow-y: auto; /* Rolagem apenas nos controles */
+                margin: 0;
+                flex-shrink: 0;
+                border-radius: 20px;
+                padding: 15px;
+            }
+
+            .card-wrapper {
+                position: static;
+                width: 100%;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+                overflow: visible;
+                display: flex;
+                justify-content: center;
+                align-items: center; /* Centraliza a carta na tela */
+                flex: 1;
+            }
+
+            .card-container {
+                transform: scale(0.65); /* Reduz a carta para caber na altura */
+                transform-origin: center center;
+                margin: 0;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.5); /* Sombra mais suave */
+            }
+
+            .preview-toggle {
+                display: none; /* Não precisa minimizar no modo paisagem */
+            }
+
+            /* Ajusta os tamanhos das alças para o toque */
+            .resize-handle { width: 20px; height: 20px; }
+            .resize-handle.se { bottom: -10px; right: -10px; }
+            .resize-handle.e { right: -10px; width: 16px; height: 16px; }
+            .resize-handle.s { bottom: -10px; width: 16px; height: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <input type="file" id="hiddenIconUpload" accept="image/*" style="display: none;">
+
+    <div class="controls">
+        <h2>🃏 Th Card Maker</h2>
+
+        <div class="control-group">
+            <label>🏷️ Nome da carta</label>
+            <input type="text" id="nameInput" placeholder="Ex: Dragão de Fogo" value="Dragão de Fogo">
+        </div>
+
+        <div class="control-group">
+            <label>🖼️ Imagem Principal</label>
+            <input type="file" id="imageUpload" accept="image/*">
+        </div>
+
+        <div class="control-group">
+            <label>🌄 Imagem de Fundo (Opcional)</label>
+            <input type="file" id="bgImageUpload" accept="image/*">
+            <button class="btn btn-outline btn-small" id="removeBgBtn" style="margin-top: 4px; display: none;">Remover Fundo</button>
+        </div>
+
+        <div class="control-group" id="imageAdjustGroup" style="display: none;">
+            <label>🔍 Ajuste da Imagem Principal</label>
+            <div class="slider-row">
+                <span style="font-size: 0.75rem; color: #c9b77b;">Zoom</span>
+                <input type="range" id="zoomSlider" min="50" max="400" value="100">
+                <span class="slider-value" id="zoomValue">100%</span>
+            </div>
+            <div class="slider-row">
+                <span style="font-size: 0.75rem; color: #c9b77b;">X</span>
+                <input type="range" id="posXSlider" min="-100" max="100" value="0">
+                <span class="slider-value" id="posXValue">0</span>
+            </div>
+            <div class="slider-row">
+                <span style="font-size: 0.75rem; color: #c9b77b;">Y</span>
+                <input type="range" id="posYSlider" min="-100" max="100" value="0">
+                <span class="slider-value" id="posYValue">0</span>
+            </div>
+            <button class="btn btn-outline btn-small" id="resetImageBtn" style="margin-top: 6px;">
+                🔄 Resetar imagem
+            </button>
+        </div>
+
+        <!-- ================= CONTROLES GLOBAIS ================= -->
+        <div class="control-group" style="background: rgba(255, 215, 100, 0.1); padding: 12px; border-radius: 14px; border: 1px solid #ffdb7c55;">
+            <label style="color: #ffdb7c; text-align: center; margin-bottom: 6px;">🎯 Elemento Selecionado</label>
+            <div class="slider-row">
+                <span style="font-size: 0.75rem; color: #c9b77b; min-width: 60px;">Opacidade</span>
+                <input type="range" id="globalOpacitySlider" min="0" max="100" value="100" disabled>
+                <span class="slider-value" id="globalOpacityValue">--</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <button class="btn btn-outline btn-small" id="selectOuterBgBtn" style="flex:1; font-size: 0.65rem;">Fundo Ext.</button>
+                <button class="btn btn-outline btn-small" id="selectBgImageBtn" style="flex:1; font-size: 0.65rem;">Img Fundo</button>
+                <button class="btn btn-outline btn-small" id="selectInnerBgBtn" style="flex:1; font-size: 0.65rem;">Fundo Int.</button>
+            </div>
+            <div class="info-tip" style="margin-top: 8px; text-align: center; padding: 0;">
+                Clique no título, imagem, caixas ou nos botões acima para selecionar.
+            </div>
+        </div>
+
+        <!-- ================= DESCRIÇÃO ================= -->
+        <div class="control-group">
+            <label>📝 Descrição</label>
+            <textarea id="descriptionInput" placeholder="Digite o texto de descrição..." rows="4">Uma criatura mística que habita as montanhas de éter.</textarea>
+            <button class="btn btn-outline btn-small" id="addDescriptionBtn" style="margin-top: 4px;">
+                📌 Mostrar descrição na carta
+            </button>
+
+            <div class="subsection">
+                <div class="subsection-title">Estilo da descrição</div>
+                <div class="slider-row">
+                    <span style="font-size: 0.75rem; color: #c9b77b;">A</span>
+                    <input type="range" id="descFontSizeSlider" min="8" max="32" value="12">
+                    <span class="slider-value" id="descFontSizeValue">12px</span>
+                </div>
+                <div class="color-row">
+                    <label>Cor do texto</label>
+                    <input type="color" id="descTextColor" value="#eae3d0">
+                </div>
+                <div class="color-row">
+                    <label>Fundo</label>
+                    <input type="color" id="descBgColor" value="#0e0e14">
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ================= CORES DA CARTA ================= -->
+        <div class="control-group">
+            <label>🎨 Cores da carta</label>
+            <div class="color-row" style="margin-bottom: 6px;">
+                <label>Fundo externo</label>
+                <input type="color" id="bgColor1" value="#2e2e3f">
+            </div>
+            <div class="color-row" style="margin-bottom: 6px;">
+                <label>Fundo interno</label>
+                <input type="color" id="bgColor2" value="#1f1f2b">
+            </div>
+            <div class="color-row" style="margin-bottom: 6px;">
+                <label>Bordas</label>
+                <input type="color" id="borderColor" value="#ffdb7c">
+            </div>
+            <div class="color-row" style="margin-bottom: 6px;">
+                <label>Cor do título</label>
+                <input type="color" id="titleColor" value="#ffdb7c">
+            </div>
+            <div class="color-row">
+                <label>Fundo do título</label>
+                <input type="color" id="titleBgColor" value="#2a2416">
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ================= CAIXAS DE TEXTO ================= -->
+        <div class="control-group">
+            <label>🔠 Caixas de texto</label>
+            <div class="slider-row">
+                <span style="font-size: 0.75rem; color: #c9b77b;">A</span>
+                <input type="range" id="fontSizeSlider" min="8" max="48" value="13">
+                <span class="slider-value" id="fontSizeValue">13px</span>
+            </div>
+            <div class="color-row" style="margin-top: 8px;">
+                <label>Cor do texto</label>
+                <input type="color" id="textColorPicker" value="#eae3d0">
+            </div>
+            <div class="color-row" style="margin-top: 8px;">
+                <label>Fundo</label>
+                <input type="color" id="boxBgColorPicker" value="#0e0e14">
+            </div>
+            <div class="color-row" style="margin-top: 8px;">
+                <label>Cor da borda</label>
+                <input type="color" id="boxBorderColorPicker" value="#ffdb7c">
+            </div>
+            <div class="slider-row" style="margin-top: 8px;">
+                <span style="font-size: 0.75rem; color: #c9b77b;">Arredondar</span>
+                <input type="range" id="boxRadiusSlider" min="0" max="50" value="8">
+                <span class="slider-value" id="boxRadiusValue">8px</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <button class="btn btn-outline" id="addTextBoxBtn" style="flex: 1; padding: 10px 5px; font-size: 0.8rem;">
+                ➕ Caixa
+            </button>
+            <button class="btn btn-outline" id="addIconBtn" style="flex: 1; padding: 10px 5px; font-size: 0.8rem;">
+                🖼️ Ícone
+            </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="subsection" style="margin-bottom: 10px;">
+            <div class="subsection-title">📦 Layout da Carta</div>
+            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                <button class="btn btn-outline btn-small" id="savePresetBtn" style="flex: 1; font-size: 0.7rem;">💾 Salvar</button>
+                <button class="btn btn-outline btn-small" id="loadPresetBtn" style="flex: 1; font-size: 0.7rem;">📂 Carregar</button>
+            </div>
+            <div style="display: flex; gap: 6px;">
+                <button class="btn btn-small" id="exportLayoutBtn" style="flex: 1; font-size: 0.7rem; padding: 8px;">⬇️ Exportar JSON</button>
+                <button class="btn btn-small" id="importLayoutBtn" style="flex: 1; font-size: 0.7rem; padding: 8px;">⬆️ Importar JSON</button>
+            </div>
+            <input type="file" id="layoutFileInput" accept=".json,application/json" style="display: none;">
+            <div class="info-tip" style="margin-top: 6px; padding: 0; font-size: 0.65rem; text-align: left; line-height: 1.4;">
+                💾 <b>Salvar/Carregar</b>: rápido, no navegador.<br>
+                📦 <b>Exportar/Importar JSON</b>: arquivo portátil com textos, imagens e layout completos.
+            </div>
+        </div>
+
+        <button class="btn btn-danger" id="deleteSelectedBtn">
+            🗑️ Excluir item selecionado
+        </button>
+
+        <button class="btn btn-outline" id="downloadPngBtn" style="margin-top: 10px;">
+            ⬇️ Salvar como PNG
+        </button>
+
+        <div class="info-tip">
+            💡 Clique e arraste para mover.<br>
+            Duplo clique edita texto (ou troca a imagem).<br>
+            Use os fundos e caixas para opacidade.
+        </div>
+    </div>
+
+    <div class="card-wrapper" id="cardWrapper">
+        <button class="preview-toggle" id="previewToggle" title="Minimizar carta">▾</button>
+        <div class="card-container" id="cardContainer">
+            <div class="tcg-card" id="tcgCard">
+                <!-- Camada de Fundo Externo (Cor) -->
+                <div id="outerBgLayer" class="bg-layer" style="border-radius: 28px;"></div>
+                <!-- Camada de Fundo Externo (Imagem) -->
+                <div id="bgImageLayer" class="bg-layer" style="background-size: cover; background-position: center; border-radius: 28px;"></div>
+
+                <div class="card-inner" id="cardInner">
+                    <!-- Camada de Fundo Interno (Cor) -->
+                    <div id="innerBgLayer" class="bg-layer" style="border-radius: 18px;"></div>
+                    
+                    <!-- Conteúdo da carta -->
+                    <div class="card-content-wrapper">
+                        <div class="card-name-bar" id="cardNameBar">
+                            <h3 id="cardNameDisplay">Dragão de Fogo</h3>
+                        </div>
+
+                        <div class="image-frame-wrapper" id="imageFrameWrapper">
+                            <div class="card-image-area" id="imageArea">
+                                <div class="image-placeholder" id="imagePlaceholder">
+                                    🖼️<br>Imagem
+                                </div>
+                                <img id="cardImage" style="display: none;" alt="Carta" draggable="false">
+                            </div>
+                        </div>
+
+                        <div class="card-description" id="cardDescription"><span class="desc-text" id="descText"></span></div>
+
+                        <div class="free-text-layer" id="freeTextLayer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const $ = (id) => document.getElementById(id);
+
+            // Elementos Principais
+            const tcgCard = $('tcgCard');
+            const cardInner = $('cardInner');
+            const cardNameBar = $('cardNameBar');
+            const imageFrameWrapper = $('imageFrameWrapper');
+            const cardDescription = $('cardDescription');
+            const freeTextLayer = $('freeTextLayer');
+            const cardContainer = $('cardContainer');
+            const cardWrapper = $('cardWrapper');
+            const previewToggle = $('previewToggle');
+            const hiddenIconUpload = $('hiddenIconUpload');
+            
+            // Camadas de Fundo
+            const outerBgLayer = $('outerBgLayer');
+            const bgImageLayer = $('bgImageLayer');
+            const innerBgLayer = $('innerBgLayer');
+
+            // Uploads e Ajustes
+            const imageUpload = $('imageUpload');
+            const bgImageUpload = $('bgImageUpload');
+            const removeBgBtn = $('removeBgBtn');
+            const cardImage = $('cardImage');
+            const imagePlaceholder = $('imagePlaceholder');
+            const zoomSlider = $('zoomSlider');
+            const posXSlider = $('posXSlider');
+            const posYSlider = $('posYSlider');
+            const zoomValue = $('zoomValue');
+            const posXValue = $('posXValue');
+            const posYValue = $('posYValue');
+            const imageAdjustGroup = $('imageAdjustGroup');
+            const resetImageBtn = $('resetImageBtn');
+
+            // Textos
+            const nameInput = $('nameInput');
+            const cardNameDisplay = $('cardNameDisplay');
+            const descriptionInput = $('descriptionInput');
+            const descText = $('descText');
+
+            // Controles Globais e Cores
+            const globalOpacitySlider = $('globalOpacitySlider');
+            const globalOpacityValue = $('globalOpacityValue');
+            const bgColor1 = $('bgColor1');
+            const bgColor2 = $('bgColor2');
+            const borderColor = $('borderColor');
+            const titleColor = $('titleColor');
+            const titleBgColor = $('titleBgColor');
+
+            // Botões de Fundo
+            const selectOuterBgBtn = $('selectOuterBgBtn');
+            const selectBgImageBtn = $('selectBgImageBtn');
+            const selectInnerBgBtn = $('selectInnerBgBtn');
+
+            // Controles Caixas de Texto
+            const fontSizeSlider = $('fontSizeSlider');
+            const fontSizeValue = $('fontSizeValue');
+            const textColorPicker = $('textColorPicker');
+            const boxBgColorPicker = $('boxBgColorPicker');
+            const boxBorderColorPicker = $('boxBorderColorPicker');
+            const boxRadiusSlider = $('boxRadiusSlider');
+            const boxRadiusValue = $('boxRadiusValue');
+
+            // Controles Descrição
+            const descFontSizeSlider = $('descFontSizeSlider');
+            const descFontSizeValue = $('descFontSizeValue');
+            const descTextColor = $('descTextColor');
+            const descBgColor = $('descBgColor');
+
+            // Botões
+            const addTextBoxBtn = $('addTextBoxBtn');
+            const addIconBtn = $('addIconBtn');
+            const addDescriptionBtn = $('addDescriptionBtn');
+            const downloadPngBtn = $('downloadPngBtn');
+            const deleteSelectedBtn = $('deleteSelectedBtn');
+            const savePresetBtn = $('savePresetBtn');
+            const loadPresetBtn = $('loadPresetBtn');
+            const exportLayoutBtn = $('exportLayoutBtn');
+            const importLayoutBtn = $('importLayoutBtn');
+            const layoutFileInput = $('layoutFileInput');
+
+            let boxCounter = 0;
+            let selectedElement = null;
+            let descriptionVisible = false;
+            
+            // Estado padrão para novas caixas
+            let defaultBoxStyle = {
+                fontSize: 13,
+                color: '#eae3d0',
+                bg: '#0e0e14',
+                borderColor: '#ffdb7c',
+                radius: 8
+            };
+
+            const imageState = { zoom: 100, posX: 0, posY: 0 };
+
+            /* ===================== SELEÇÃO GLOBAL ===================== */
+            function selectElement(el) {
+                if (selectedElement === el) return;
+                
+                if (selectedElement) {
+                    selectedElement.classList.remove('element-selected');
+                    if (selectedElement.classList.contains('free-text-box') || selectedElement === cardDescription) {
+                        selectedElement.classList.remove('selected');
+                    }
+                }
+
+                selectedElement = el;
+
+                if (selectedElement) {
+                    if (!selectedElement.classList.contains('bg-layer')) {
+                        selectedElement.classList.add('element-selected');
+                    }
+                    
+                    if (selectedElement.classList.contains('free-text-box') || selectedElement === cardDescription) {
+                        selectedElement.classList.add('selected');
+                    }
+                    
+                    globalOpacitySlider.disabled = false;
+                    const op = Math.round(parseFloat(getComputedStyle(selectedElement).opacity) * 100);
+                    globalOpacitySlider.value = op;
+                    globalOpacityValue.textContent = op + '%';
+
+                    syncStyleControls(selectedElement);
+                } else {
+                    globalOpacitySlider.disabled = true;
+                    globalOpacityValue.textContent = '--';
+                }
+            }
+
+            function deselectAll() {
+                selectElement(outerBgLayer);
+            }
+
+            selectOuterBgBtn.addEventListener('click', () => selectElement(outerBgLayer));
+            selectBgImageBtn.addEventListener('click', () => selectElement(bgImageLayer));
+            selectInnerBgBtn.addEventListener('click', () => selectElement(innerBgLayer));
+
+            tcgCard.addEventListener('pointerdown', (e) => {
+                if (e.target === tcgCard || e.target === outerBgLayer || e.target === bgImageLayer) {
+                    selectElement(outerBgLayer);
+                }
+            });
+
+            cardNameBar.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                selectElement(cardNameBar);
+            });
+
+            imageFrameWrapper.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                selectElement(imageFrameWrapper);
+            });
+
+            globalOpacitySlider.addEventListener('input', () => {
+                if (!selectedElement) return;
+                const op = parseInt(globalOpacitySlider.value);
+                globalOpacityValue.textContent = op + '%';
+                selectedElement.style.opacity = (op / 100).toString();
+            });
+
+            /* ===================== CONTROLES ESPECÍFICOS ===================== */
+            function rgbToHex(rgb) {
+                const m = rgb.match(/\d+/g);
+                if (!m) return '#000000';
+                return '#' + m.slice(0, 3)
+                    .map(n => parseInt(n).toString(16).padStart(2, '0')).join('');
+            }
+
+            function syncStyleControls(el) {
+                const cs = getComputedStyle(el);
+                const fs = Math.round(parseFloat(cs.fontSize));
+                const color = rgbToHex(cs.color);
+                const bg = rgbToHex(cs.backgroundColor);
+                const border = rgbToHex(cs.borderColor);
+                const rad = Math.round(parseFloat(cs.borderRadius));
+
+                if (el === cardDescription) {
+                    descFontSizeSlider.value = fs;
+                    descFontSizeValue.textContent = fs + 'px';
+                    descTextColor.value = color;
+                    descBgColor.value = bg;
+                } else if (el.classList.contains('free-text-box')) {
+                    fontSizeSlider.value = fs;
+                    fontSizeValue.textContent = fs + 'px';
+                    textColorPicker.value = color;
+                    if (!el.classList.contains('is-icon')) {
+                        boxBgColorPicker.value = bg;
+                        boxBorderColorPicker.value = border;
+                        boxRadiusSlider.value = rad;
+                        boxRadiusValue.textContent = rad + 'px';
+                    }
+                }
+            }
+
+            /* ===================== ESTILOS CAIXAS DE TEXTO ===================== */
+            function targetTextBoxes() {
+                if (selectedElement && selectedElement.classList.contains('free-text-box')) return [selectedElement];
+                return Array.from(freeTextLayer.querySelectorAll('.free-text-box'));
+            }
+
+            fontSizeSlider.addEventListener('input', () => {
+                const size = parseInt(fontSizeSlider.value);
+                fontSizeValue.textContent = size + 'px';
+                defaultBoxStyle.fontSize = size;
+                targetTextBoxes().forEach(b => { b.style.fontSize = size + 'px'; });
+            });
+
+            textColorPicker.addEventListener('input', () => {
+                defaultBoxStyle.color = textColorPicker.value;
+                targetTextBoxes().forEach(b => { b.style.color = textColorPicker.value; });
+            });
+
+            boxBgColorPicker.addEventListener('input', () => {
+                defaultBoxStyle.bg = boxBgColorPicker.value;
+                targetTextBoxes().forEach(b => { 
+                    if (!b.classList.contains('is-icon')) b.style.background = boxBgColorPicker.value; 
+                });
+            });
+
+            boxBorderColorPicker.addEventListener('input', () => {
+                defaultBoxStyle.borderColor = boxBorderColorPicker.value;
+                targetTextBoxes().forEach(b => { 
+                    if (!b.classList.contains('is-icon')) b.style.borderColor = boxBorderColorPicker.value; 
+                });
+            });
+
+            boxRadiusSlider.addEventListener('input', () => {
+                const rad = parseInt(boxRadiusSlider.value);
+                boxRadiusValue.textContent = rad + 'px';
+                defaultBoxStyle.radius = rad;
+                targetTextBoxes().forEach(b => { 
+                    if (!b.classList.contains('is-icon')) b.style.borderRadius = rad + 'px'; 
+                });
+            });
+
+            /* ===================== LÓGICA DE IMAGENS ===================== */
+            imageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    cardImage.src = ev.target.result;
+                    cardImage.style.display = 'block';
+                    imagePlaceholder.style.display = 'none';
+                    imageAdjustGroup.style.display = 'flex';
+                    resetImageTransform();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            bgImageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    bgImageLayer.style.backgroundImage = `url(${ev.target.result})`;
+                    removeBgBtn.style.display = 'block';
+                    selectElement(bgImageLayer);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            removeBgBtn.addEventListener('click', () => {
+                bgImageLayer.style.backgroundImage = 'none';
+                bgImageUpload.value = '';
+                removeBgBtn.style.display = 'none';
+                if (selectedElement === bgImageLayer) deselectAll();
+            });
+
+            function applyImageTransform() {
+                cardImage.style.transform =
+                    `translate(${imageState.posX}%, ${imageState.posY}%) scale(${imageState.zoom / 100})`;
+            }
+
+            function resetImageTransform() {
+                imageState.zoom = 100;
+                imageState.posX = 0;
+                imageState.posY = 0;
+                zoomSlider.value = 100;
+                posXSlider.value = 0;
+                posYSlider.value = 0;
+                zoomValue.textContent = '100%';
+                posXValue.textContent = '0';
+                posYValue.textContent = '0';
+                applyImageTransform();
+            }
+
+            zoomSlider.addEventListener('input', (e) => {
+                imageState.zoom = parseInt(e.target.value);
+                zoomValue.textContent = imageState.zoom + '%';
+                applyImageTransform();
+            });
+            posXSlider.addEventListener('input', (e) => {
+                imageState.posX = parseInt(e.target.value);
+                posXValue.textContent = imageState.posX;
+                applyImageTransform();
+            });
+            posYSlider.addEventListener('input', (e) => {
+                imageState.posY = parseInt(e.target.value);
+                posYValue.textContent = imageState.posY;
+                applyImageTransform();
+            });
+            resetImageBtn.addEventListener('click', resetImageTransform);
+
+            /* ===================== NOME E DESCRIÇÃO ===================== */
+            nameInput.addEventListener('input', (e) => {
+                cardNameDisplay.textContent = e.target.value || 'Sem nome';
+            });
+
+            descriptionInput.addEventListener('input', (e) => {
+                descText.textContent = e.target.value;
+            });
+
+            addDescriptionBtn.addEventListener('click', () => {
+                if (!descriptionVisible) {
+                    descriptionVisible = true;
+                    cardDescription.style.display = 'block';
+                    if (!cardDescription.style.left) {
+                        cardDescription.style.left = '10px';
+                        cardDescription.style.top = '255px';
+                        cardDescription.style.width = 'calc(100% - 20px)';
+                    }
+                }
+                descText.textContent = descriptionInput.value;
+                selectElement(cardDescription);
+            });
+
+            function hideDescription() {
+                cardDescription.style.display = 'none';
+                descriptionVisible = false;
+                if (selectedElement === cardDescription) deselectAll();
+            }
+
+            (function createDeleteHandleForDescription() {
+                const del = document.createElement('span');
+                del.className = 'delete-handle';
+                del.textContent = '✕';
+                del.addEventListener('pointerdown', (e) => e.stopPropagation());
+                del.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    hideDescription();
+                });
+                cardDescription.appendChild(del);
+            })();
+            makeResizable(cardDescription, 'e');
+            makeDraggable(cardDescription, cardInner);
+
+            descFontSizeSlider.addEventListener('input', () => {
+                const size = parseInt(descFontSizeSlider.value);
+                descFontSizeValue.textContent = size + 'px';
+                cardDescription.style.fontSize = size + 'px';
+            });
+
+            descTextColor.addEventListener('input', () => {
+                cardDescription.style.color = descTextColor.value;
+            });
+
+            descBgColor.addEventListener('input', () => {
+                cardDescription.style.background = descBgColor.value;
+            });
+
+            /* ===================== CORES GERAIS E FUNDOS ===================== */
+            function shadeColor(hex, percent) {
+                let R = parseInt(hex.substring(1, 3), 16);
+                let G = parseInt(hex.substring(3, 5), 16);
+                let B = parseInt(hex.substring(5, 7), 16);
+                R = Math.min(255, Math.max(0, parseInt(R * (100 + percent) / 100)));
+                G = Math.min(255, Math.max(0, parseInt(G * (100 + percent) / 100)));
+                B = Math.min(255, Math.max(0, parseInt(B * (100 + percent) / 100)));
+                return '#' + R.toString(16).padStart(2, '0') +
+                              G.toString(16).padStart(2, '0') +
+                              B.toString(16).padStart(2, '0');
+            }
+
+            function applyColors() {
+                outerBgLayer.style.background = `linear-gradient(145deg, ${bgColor1.value}, ${shadeColor(bgColor1.value, -30)})`;
+                innerBgLayer.style.background = bgColor2.value;
+                
+                tcgCard.style.setProperty('--card-border', borderColor.value);
+                tcgCard.style.setProperty('--card-title-color', titleColor.value);
+                tcgCard.style.setProperty('--card-title-bg', titleBgColor.value);
+                tcgCard.style.setProperty('--card-title-bg-light', shadeColor(titleBgColor.value, 20));
+            }
+
+            bgColor1.addEventListener('input', applyColors);
+            bgColor2.addEventListener('input', applyColors);
+            borderColor.addEventListener('input', applyColors);
+            titleColor.addEventListener('input', applyColors);
+            titleBgColor.addEventListener('input', applyColors);
+
+            /* ===================== EXCLUIR ===================== */
+            function deleteSelected() {
+                if (!selectedElement) return;
+                if (selectedElement === cardDescription) hideDescription();
+                else if (selectedElement.classList.contains('free-text-box')) {
+                    selectedElement.remove();
+                    deselectAll();
+                } else if (selectedElement.classList.contains('bg-layer')) {
+                    selectedElement.style.opacity = '1';
+                    globalOpacitySlider.value = 100;
+                    globalOpacityValue.textContent = '100%';
+                } else {
+                    alert('Este elemento não pode ser excluído (é parte da estrutura da carta).');
+                }
+            }
+
+            deleteSelectedBtn.addEventListener('click', deleteSelected);
+            document.addEventListener('keydown', (e) => {
+                if (!selectedElement) return;
+                const tag = (document.activeElement && document.activeElement.tagName) || '';
+                if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    e.preventDefault();
+                    deleteSelected();
+                }
+            });
+
+            /* ===================== ARRASTAR & REDIMENSIONAR ===================== */
+            function makeDraggable(box, parentEl) {
+                box.addEventListener('pointerdown', (e) => {
+                    if (e.target.closest('.resize-handle') || e.target.closest('.delete-handle')) return;
+                    if (e.target.tagName === 'INPUT') return;
+                    if (box.getAttribute('data-editing') === 'true') return;
+                    if (box.style.display === 'none') return;
+
+                    selectElement(box);
+                    const pRect = parentEl.getBoundingClientRect();
+                    const bRect = box.getBoundingClientRect();
+                    const sx = (pRect.width / parentEl.clientWidth) || 1;
+                    const sy = (pRect.height / parentEl.clientHeight) || 1;
+                    const startLeft = (bRect.left - pRect.left) / sx;
+                    const startTop = (bRect.top - pRect.top) / sy;
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+
+                    box.style.cursor = 'grabbing';
+                    box.style.zIndex = '500';
+                    try { box.setPointerCapture(e.pointerId); } catch (_) {}
+
+                    function onMove(ev) {
+                        const dx = (ev.clientX - startX) / sx;
+                        const dy = (ev.clientY - startY) / sy;
+                        let nl = startLeft + dx;
+                        let nt = startTop + dy;
+                        nl = Math.max(0, Math.min(nl, parentEl.clientWidth - box.offsetWidth));
+                        nt = Math.max(0, Math.min(nt, parentEl.clientHeight - box.offsetHeight));
+                        box.style.left = nl + 'px';
+                        box.style.top = nt + 'px';
+                    }
+                    function onUp() {
+                        box.removeEventListener('pointermove', onMove);
+                        box.removeEventListener('pointerup', onUp);
+                        box.removeEventListener('pointercancel', onUp);
+                        box.style.cursor = '';
+                        box.style.zIndex = '';
+                        try { box.releasePointerCapture(e.pointerId); } catch (_) {}
+                    }
+                    box.addEventListener('pointermove', onMove);
+                    box.addEventListener('pointerup', onUp);
+                    box.addEventListener('pointercancel', onUp);
+                });
+            }
+
+            function makeResizable(box, dir) {
+                const handle = document.createElement('div');
+                handle.className = 'resize-handle ' + dir;
+                handle.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    selectElement(box);
+
+                    const pRect = box.parentElement.getBoundingClientRect();
+                    const sx = (pRect.width / box.parentElement.clientWidth) || 1;
+                    const sy = (pRect.height / box.parentElement.clientHeight) || 1;
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startW = box.offsetWidth;
+                    const startH = box.offsetHeight;
+
+                    box.style.zIndex = '600';
+                    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+
+                    function onMove(ev) {
+                        const dx = (ev.clientX - startX) / sx;
+                        const dy = (ev.clientY - startY) / sy;
+                        if (dir === 'se' || dir === 'e') {
+                            box.style.width = Math.max(40, startW + dx) + 'px';
+                            if (box.classList.contains('free-text-box')) box.style.whiteSpace = 'normal';
+                        }
+                        if (dir === 'se' || dir === 's') {
+                            if (box !== cardDescription) box.style.height = Math.max(26, startH + dy) + 'px';
+                        }
+                    }
+                    function onUp() {
+                        handle.removeEventListener('pointermove', onMove);
+                        handle.removeEventListener('pointerup', onUp);
+                        handle.removeEventListener('pointercancel', onUp);
+                        box.style.zIndex = '';
+                        try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+                    }
+                    handle.addEventListener('pointermove', onMove);
+                    handle.addEventListener('pointerup', onUp);
+                    handle.addEventListener('pointercancel', onUp);
+                });
+                box.appendChild(handle);
+            }
+
+            /* ===================== CRIAR CAIXAS E ÍCONES ===================== */
+            function createElementBox(content = 'Texto', posX = 80, posY = 40, isIcon = false, isImage = false) {
+                const box = document.createElement('div');
+                box.className = 'free-text-box' + (isIcon ? ' is-icon' : '');
+                box.id = 'textbox-' + (boxCounter++);
+                box.setAttribute('data-editing', 'false');
+                box.style.left = posX + 'px';
+                box.style.top = posY + 'px';
+                
+                if (isIcon) {
+                    if (isImage) {
+                        box.style.width = '60px';
+                        box.style.height = '60px';
+                    } else {
+                        box.style.color = defaultBoxStyle.color;
+                        box.style.fontSize = '32px';
+                    }
+                } else {
+                    box.style.fontSize = defaultBoxStyle.fontSize + 'px';
+                    box.style.color = defaultBoxStyle.color;
+                    box.style.background = defaultBoxStyle.bg;
+                    box.style.borderColor = defaultBoxStyle.borderColor;
+                    box.style.borderRadius = defaultBoxStyle.radius + 'px';
+                }
+
+                if (isImage) {
+                    const img = document.createElement('img');
+                    img.src = content;
+                    box.appendChild(img);
+                } else {
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'box-text';
+                    textSpan.textContent = content;
+                    textSpan.style.pointerEvents = 'none';
+                    box.appendChild(textSpan);
+                }
+
+                const del = document.createElement('span');
+                del.className = 'delete-handle';
+                del.textContent = '✕';
+                del.addEventListener('pointerdown', (e) => e.stopPropagation());
+                del.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    box.remove();
+                    if (selectedElement === box) deselectAll();
+                });
+                box.appendChild(del);
+
+                ['se', 'e', 's'].forEach(dir => makeResizable(box, dir));
+                makeDraggable(box, freeTextLayer);
+
+                box.addEventListener('pointerdown', (e) => {
+                    if (e.target.closest('.resize-handle') || e.target.closest('.delete-handle')) return;
+                    selectElement(box);
+                });
+
+                box.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    if (box.getAttribute('data-editing') === 'true') return;
+                    
+                    const img = box.querySelector('img');
+                    if (img) {
+                        const tempInput = document.createElement('input');
+                        tempInput.type = 'file';
+                        tempInput.accept = 'image/*';
+                        tempInput.onchange = (ev) => {
+                            const file = ev.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (r) => { img.src = r.target.result; };
+                            reader.readAsDataURL(file);
+                        };
+                        tempInput.click();
+                        return;
+                    }
+
+                    if (window.innerWidth <= 850) {
+                        const span = box.querySelector('.box-text');
+                        const t = prompt('Editar texto:', span.textContent);
+                        if (t !== null) {
+                            span.textContent = t.trim() || 'Texto';
+                            box.setAttribute('data-text', span.textContent);
+                        }
+                        return;
+                    }
+                    startEditing(box);
+                });
+
+                freeTextLayer.appendChild(box);
+                selectElement(box);
+                return box;
+            }
+
+            function startEditing(box) {
+                if (box.getAttribute('data-editing') === 'true') return;
+                box.setAttribute('data-editing', 'true');
+
+                const textSpan = box.querySelector('.box-text');
+                const currentText = textSpan.textContent;
+                textSpan.style.display = 'none';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentText;
+                input.style.width = Math.max(60, box.offsetWidth - 16) + 'px';
+                input.style.background = 'transparent';
+                input.style.border = 'none';
+                input.style.color = getComputedStyle(box).color;
+                input.style.fontWeight = '600';
+                input.style.fontSize = 'inherit';
+                input.style.textAlign = 'center';
+                input.style.outline = 'none';
+                input.style.fontFamily = 'inherit';
+                input.style.pointerEvents = 'auto';
+
+                box.appendChild(input);
+                input.focus();
+                input.select();
+
+                let done = false;
+                function finish() {
+                    if (done) return;
+                    done = true;
+                    const newText = input.value.trim() || (box.classList.contains('is-icon') ? '⭐' : 'Texto');
+                    textSpan.textContent = newText;
+                    textSpan.style.display = '';
+                    box.setAttribute('data-text', newText);
+                    box.setAttribute('data-editing', 'false');
+                    if (input.parentNode === box) box.removeChild(input);
+                }
+
+                input.addEventListener('blur', finish);
+                input.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+                    if (ev.key === 'Escape') { input.value = currentText; input.blur(); }
+                });
+                input.addEventListener('dblclick', (e) => e.stopPropagation());
+                input.addEventListener('pointerdown', (e) => e.stopPropagation());
+            }
+
+            addTextBoxBtn.addEventListener('click', () => {
+                createElementBox('Texto', 30 + Math.random() * 120, 20 + Math.random() * 80, false, false);
+            });
+
+            addIconBtn.addEventListener('click', () => hiddenIconUpload.click());
+            hiddenIconUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    createElementBox(ev.target.result, 50 + Math.random() * 100, 50 + Math.random() * 100, true, true);
+                };
+                reader.readAsDataURL(file);
+                hiddenIconUpload.value = '';
+            });
+
+            /* ===================== ESTADO COMPLETO DO LAYOUT ===================== */
+            function collectLayoutState() {
+                const state = {
+                    format: 'tcg-card-layout',
+                    version: 2,
+                    name: nameInput.value,
+                    description: {
+                        text: descriptionInput.value,
+                        visible: descriptionVisible,
+                        left: cardDescription.style.left || '',
+                        top: cardDescription.style.top || '',
+                        width: cardDescription.style.width || '',
+                        height: cardDescription.style.height || '',
+                        fontSize: cardDescription.style.fontSize || '',
+                        color: cardDescription.style.color || '',
+                        background: cardDescription.style.backgroundColor || '',
+                        opacity: cardDescription.style.opacity || '1'
+                    },
+                    colors: {
+                        bg1: bgColor1.value,
+                        bg2: bgColor2.value,
+                        border: borderColor.value,
+                        title: titleColor.value,
+                        titleBg: titleBgColor.value
+                    },
+                    opacities: {
+                        outerBg: outerBgLayer.style.opacity || '1',
+                        bgImage: bgImageLayer.style.opacity || '1',
+                        innerBg: innerBgLayer.style.opacity || '1',
+                        nameBar: cardNameBar.style.opacity || '1',
+                        imageFrame: imageFrameWrapper.style.opacity || '1'
+                    },
+                    image: {
+                        src: (cardImage.style.display !== 'none' && cardImage.getAttribute('src'))
+                            ? cardImage.src : '',
+                        zoom: imageState.zoom,
+                        posX: imageState.posX,
+                        posY: imageState.posY
+                    },
+                    bgImage: (bgImageLayer.style.backgroundImage && bgImageLayer.style.backgroundImage !== 'none')
+                        ? bgImageLayer.style.backgroundImage : '',
+                    boxes: []
+                };
+
+                document.querySelectorAll('.free-text-box').forEach(box => {
+                    const img = box.querySelector('img');
+                    const textSpan = box.querySelector('.box-text');
+                    state.boxes.push({
+                        type: img ? 'image-icon' : (box.classList.contains('is-icon') ? 'text-icon' : 'text'),
+                        content: img ? img.src : (textSpan ? textSpan.textContent : ''),
+                        left: box.style.left || '',
+                        top: box.style.top || '',
+                        width: box.style.width || '',
+                        height: box.style.height || '',
+                        fontSize: box.style.fontSize || '',
+                        color: box.style.color || '',
+                        background: box.style.backgroundColor || '',
+                        borderColor: box.style.borderColor || '',
+                        borderRadius: box.style.borderRadius || '',
+                        opacity: box.style.opacity || '1'
+                    });
+                });
+
+                return state;
+            }
+
+            function applyLayoutState(state) {
+                if (!state || typeof state !== 'object') {
+                    throw new Error('Arquivo de layout inválido.');
+                }
+
+                // Limpa caixas existentes
+                freeTextLayer.innerHTML = '';
+                selectedElement = null;
+
+                // --- Nome ---
+                nameInput.value = state.name || '';
+                cardNameDisplay.textContent = state.name || 'Sem nome';
+
+                // --- Descrição ---
+                const d = state.description || {};
+                descriptionInput.value = d.text || '';
+                descText.textContent = d.text || '';
+                cardDescription.style.left = d.left || '10px';
+                cardDescription.style.top = d.top || '255px';
+                cardDescription.style.width = d.width || 'calc(100% - 20px)';
+                cardDescription.style.height = d.height || '';
+                cardDescription.style.fontSize = d.fontSize || '';
+                cardDescription.style.color = d.color || '';
+                cardDescription.style.background = d.background || '';
+                cardDescription.style.opacity = d.opacity || '1';
+
+                if (d.fontSize) {
+                    const fs = parseInt(d.fontSize);
+                    if (!isNaN(fs)) {
+                        descFontSizeSlider.value = fs;
+                        descFontSizeValue.textContent = fs + 'px';
+                    }
+                }
+                if (d.color && /^#[0-9a-f]{6}$/i.test(d.color)) descTextColor.value = d.color;
+                if (d.background && /^#[0-9a-f]{6}$/i.test(d.background)) descBgColor.value = d.background;
+
+                descriptionVisible = d.visible !== false;
+                cardDescription.style.display = descriptionVisible ? 'block' : 'none';
+
+                // --- Cores ---
+                const c = state.colors || {};
+                if (c.bg1) bgColor1.value = c.bg1;
+                if (c.bg2) bgColor2.value = c.bg2;
+                if (c.border) borderColor.value = c.border;
+                if (c.title) titleColor.value = c.title;
+                if (c.titleBg) titleBgColor.value = c.titleBg;
+                applyColors();
+
+                // --- Opacidades ---
+                const o = state.opacities || {};
+                outerBgLayer.style.opacity = o.outerBg || '1';
+                bgImageLayer.style.opacity = o.bgImage || '1';
+                innerBgLayer.style.opacity = o.innerBg || '1';
+                cardNameBar.style.opacity = o.nameBar || '1';
+                imageFrameWrapper.style.opacity = o.imageFrame || '1';
+
+                // --- Imagem Principal ---
+                const img = state.image || {};
+                if (img.src) {
+                    cardImage.src = img.src;
+                    cardImage.style.display = 'block';
+                    imagePlaceholder.style.display = 'none';
+                    imageAdjustGroup.style.display = 'flex';
+                } else {
+                    cardImage.removeAttribute('src');
+                    cardImage.style.display = 'none';
+                    imagePlaceholder.style.display = 'block';
+                    imageAdjustGroup.style.display = 'none';
+                }
+                imageState.zoom = img.zoom || 100;
+                imageState.posX = img.posX || 0;
+                imageState.posY = img.posY || 0;
+                zoomSlider.value = imageState.zoom;
+                posXSlider.value = imageState.posX;
+                posYSlider.value = imageState.posY;
+                zoomValue.textContent = imageState.zoom + '%';
+                posXValue.textContent = imageState.posX;
+                posYValue.textContent = imageState.posY;
+                applyImageTransform();
+
+                // --- Imagem de Fundo ---
+                if (state.bgImage) {
+                    bgImageLayer.style.backgroundImage = state.bgImage;
+                    removeBgBtn.style.display = 'block';
+                } else {
+                    bgImageLayer.style.backgroundImage = 'none';
+                    removeBgBtn.style.display = 'none';
+                }
+
+                // --- Caixas ---
+                (state.boxes || []).forEach(b => {
+                    const isImage = b.type === 'image-icon';
+                    const isIcon = b.type === 'image-icon' || b.type === 'text-icon';
+                    const posX = b.left ? parseFloat(b.left) || 0 : 0;
+                    const posY = b.top ? parseFloat(b.top) || 0 : 0;
+
+                    const box = createElementBox(b.content || '', posX, posY, isIcon, isImage);
+
+                    if (b.width) box.style.width = b.width;
+                    if (b.height) box.style.height = b.height;
+                    if (b.fontSize) box.style.fontSize = b.fontSize;
+                    if (b.color) box.style.color = b.color;
+                    if (b.background && !isIcon) box.style.backgroundColor = b.background;
+                    if (b.borderColor && !isIcon) box.style.borderColor = b.borderColor;
+                    if (b.borderRadius && !isIcon) box.style.borderRadius = b.borderRadius;
+                    if (b.opacity) box.style.opacity = b.opacity;
+                });
+
+                deselectAll();
+            }
+
+            /* ===================== SALVAR / CARREGAR (localStorage) ===================== */
+            savePresetBtn.addEventListener('click', () => {
+                try {
+                    localStorage.setItem('tcgCardPreset', JSON.stringify(collectLayoutState()));
+                    alert('Preset salvo com sucesso!');
+                } catch (err) {
+                    alert('Erro ao salvar preset: ' + err.message);
+                }
+            });
+
+            loadPresetBtn.addEventListener('click', () => {
+                const saved = localStorage.getItem('tcgCardPreset');
+                if (!saved) return alert('Nenhum preset salvo encontrado.');
+                try {
+                    applyLayoutState(JSON.parse(saved));
+                    alert('Preset carregado!');
+                } catch (err) {
+                    alert('Erro ao carregar preset: ' + err.message);
+                }
+            });
+
+            /* ===================== EXPORTAR / IMPORTAR JSON ===================== */
+            exportLayoutBtn.addEventListener('click', () => {
+                try {
+                    const state = collectLayoutState();
+                    const json = JSON.stringify(state, null, 2);
+                    const blob = new Blob([json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const safeName = (state.name || 'carta').trim()
+                        .replace(/[^a-z0-9]+/gi, '_')
+                        .toLowerCase()
+                        .substring(0, 40) || 'carta';
+                    a.href = url;
+                    a.download = `layout-${safeName}-${Date.now()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch (err) {
+                    alert('Erro ao exportar: ' + err.message);
+                }
+            });
+
+            importLayoutBtn.addEventListener('click', () => layoutFileInput.click());
+
+            layoutFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const state = JSON.parse(ev.target.result);
+                        applyLayoutState(state);
+                    } catch (err) {
+                        alert('Erro ao importar JSON: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+                layoutFileInput.value = '';
+            });
+
+            /* ===================== EXPORTAR PNG ===================== */
+            downloadPngBtn.addEventListener('click', async () => {
+                // Remove classes de seleção e esconde handles da UI
+                document.querySelectorAll('.element-selected, .selected').forEach(el => {
+                    el.classList.remove('element-selected', 'selected');
+                });
+                document.querySelectorAll('.delete-handle, .resize-handle').forEach(h => {
+                    h.style.display = 'none';
+                });
+
+                const prevTransform = cardContainer.style.transform;
+                const prevMargin = cardContainer.style.marginBottom;
+                cardContainer.style.transform = 'none';
+                cardContainer.style.marginBottom = '0';
+
+                try {
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const canvas = await html2canvas(tcgCard, {
+                        scale: 2,
+                        backgroundColor: null, // deixa o fundo transparente do elemento
+                        allowTaint: false,
+                        useCORS: true,
+                        logging: false,
+                        onclone: (clonedDoc) => {
+                            // --- Limpeza geral ---
+                            clonedDoc.querySelectorAll('*').forEach(el => {
+                                el.style.backdropFilter = 'none';
+                                el.style.webkitBackdropFilter = 'none';
+                            });
+
+                            clonedDoc.querySelectorAll('.delete-handle, .resize-handle').forEach(h => {
+                                h.style.display = 'none';
+                            });
+                            clonedDoc.querySelectorAll('.element-selected, .selected').forEach(el => {
+                                el.classList.remove('element-selected', 'selected');
+                            });
+
+                            const cc = clonedDoc.getElementById('cardContainer');
+                            if (cc) {
+                                cc.style.transform = 'none';
+                                cc.style.marginBottom = '0';
+                                cc.style.boxShadow = 'none';
+                                cc.style.overflow = 'hidden';
+                            }
+
+                            // =====================================================
+                            // CORREÇÃO PRINCIPAL: manchas pretas + opacidade
+                            // =====================================================
+
+                            // 1. Remove TODAS as box-shadow (inset causa manchas pretas)
+                            clonedDoc.querySelectorAll('*').forEach(el => {
+                                el.style.boxShadow = 'none';
+                            });
+
+                            // 2. Título: força fundo sólido (evita artefato do gradient + shadow)
+                            const titleBar = clonedDoc.getElementById('cardNameBar');
+                            if (titleBar) {
+                                const titleBg = getComputedStyle(cardNameBar).backgroundColor;
+                                // Usa a cor base do título (sem o gradient que gera manchas)
+                                const solidTitleBg = titleBgColor ? titleBgColor.value : '#2a2416';
+                                titleBar.style.background = solidTitleBg;
+                                titleBar.style.backgroundImage = 'none';
+                                titleBar.style.boxShadow = 'none';
+                            }
+
+                            // 3. Card e inner: sem sombra inset
+                            const tcgCardClone = clonedDoc.getElementById('tcgCard');
+                            if (tcgCardClone) {
+                                tcgCardClone.style.boxShadow = 'none';
+                            }
+                            const cardInnerClone = clonedDoc.getElementById('cardInner');
+                            if (cardInnerClone) {
+                                cardInnerClone.style.boxShadow = 'none';
+                            }
+
+                            // 4. Descrição: remove inset shadow
+                            const descClone = clonedDoc.getElementById('cardDescription');
+                            if (descClone) {
+                                descClone.style.boxShadow = 'none';
+                            }
+
+                            // 5. Força a opacidade de todas as camadas importantes
+                            //    (html2canvas frequentemente perde o valor de opacity)
+                            function forceOpacity(originalEl, cloneId) {
+                                const clone = clonedDoc.getElementById(cloneId);
+                                if (!clone || !originalEl) return;
+                                const op = originalEl.style.opacity !== '' 
+                                    ? originalEl.style.opacity 
+                                    : getComputedStyle(originalEl).opacity;
+                                clone.style.opacity = op;
+                            }
+
+                            forceOpacity(outerBgLayer, 'outerBgLayer');
+                            forceOpacity(bgImageLayer, 'bgImageLayer');
+                            forceOpacity(innerBgLayer, 'innerBgLayer');
+                            forceOpacity(cardNameBar, 'cardNameBar');
+                            forceOpacity(imageFrameWrapper, 'imageFrameWrapper');
+                            forceOpacity(cardDescription, 'cardDescription');
+
+                            // 6. Opacidade das caixas de texto livres
+                            const originalBoxes = freeTextLayer.querySelectorAll('.free-text-box');
+                            const clonedBoxes = clonedDoc.querySelectorAll('.free-text-box');
+                            originalBoxes.forEach((orig, i) => {
+                                if (clonedBoxes[i]) {
+                                    const op = orig.style.opacity !== '' 
+                                        ? orig.style.opacity 
+                                        : getComputedStyle(orig).opacity;
+                                    clonedBoxes[i].style.opacity = op;
+                                    // também remove sombra das caixas
+                                    clonedBoxes[i].style.boxShadow = 'none';
+                                }
+                            });
+
+                            // 7. Garante que as camadas de fundo tenham background visível
+                            //    (evita área preta quando opacity < 1)
+                            const outerClone = clonedDoc.getElementById('outerBgLayer');
+                            if (outerClone && outerBgLayer) {
+                                const bg = outerBgLayer.style.background || getComputedStyle(outerBgLayer).background;
+                                if (bg && bg !== 'none') {
+                                    outerClone.style.background = bg;
+                                }
+                            }
+                            const innerClone = clonedDoc.getElementById('innerBgLayer');
+                            if (innerClone && innerBgLayer) {
+                                const bg = innerBgLayer.style.background || getComputedStyle(innerBgLayer).background;
+                                if (bg && bg !== 'none') {
+                                    innerClone.style.background = bg;
+                                }
+                            }
+                        }
+                    });
+
+                    const link = document.createElement('a');
+                    link.download = `carta-tcg-${Date.now()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                } catch (error) {
+                    console.error('Erro ao exportar PNG:', error);
+                    alert('Ocorreu um erro ao exportar a imagem. Tente novamente.');
+                } finally {
+                    document.querySelectorAll('.delete-handle, .resize-handle').forEach(h => {
+                        h.style.display = '';
+                    });
+                    if (selectedElement) {
+                        selectedElement.classList.add('element-selected');
+                        if (selectedElement.classList.contains('free-text-box') || selectedElement === cardDescription) {
+                            selectedElement.classList.add('selected');
+                        }
+                    }
+                    cardContainer.style.transform = prevTransform;
+                    cardContainer.style.marginBottom = prevMargin;
+                }
+            });
+
+            /* ===================== INICIALIZAÇÃO ===================== */
+            tcgCard.addEventListener('dragstart', (e) => e.preventDefault());
+            applyColors();
+            applyImageTransform();
+
+            cardDescription.style.display = 'block';
+            descText.textContent = descriptionInput.value;
+            cardDescription.style.left = '10px';
+            cardDescription.style.top = '255px';
+            cardDescription.style.width = 'calc(100% - 20px)';
+            descriptionVisible = true;
+
+            deselectAll();
+
+        })();
+    </script>
+</body>
+</html>
