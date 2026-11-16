@@ -1,0 +1,29 @@
+TH CARD MAKER — PWA TEST
+
+Arquivos:
+- index.html: seu site original com botão de instalação e registro do Service Worker.
+- manifest.json: nome, cores, ícones e modo standalone.
+- service-worker.js: registro e cache básico do app shell.
+- icons/: ícones 192x192 e 512x512.
+
+PUBLICAÇÃO NO GITHUB PAGES
+1. Faça backup do index.html atual.
+2. Copie todos os arquivos e a pasta icons para a mesma pasta onde fica o index.html publicado.
+3. Mantenha a estrutura:
+   index.html
+   manifest.json
+   service-worker.js
+   icons/icon-192.png
+   icons/icon-512.png
+4. Faça commit e push para o GitHub Pages.
+5. Abra o endereço HTTPS do site no Chrome/Edge e aguarde alguns segundos.
+
+OBSERVAÇÃO SOBRE O BOTÃO
+O botão "Instalar aplicativo" só aparece quando o navegador dispara o evento
+beforeinstallprompt, ou seja, quando considera o site elegível para instalação.
+Isso não é controlado diretamente pelo código do botão. Em alguns navegadores,
+especialmente Safari/iOS, esse evento não existe e a instalação é feita pelo menu
+"Adicionar à Tela de Início".
+
+O site usa a biblioteca html2canvas via CDN. O service worker não tenta armazenar
+essa biblioteca; por isso a exportação PNG pode continuar dependendo da internet.

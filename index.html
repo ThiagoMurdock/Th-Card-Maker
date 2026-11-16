@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Th Card Maker</title>
+    <meta name="theme-color" content="#1a1a28">
+    <meta name="application-name" content="Th Card Maker">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
@@ -194,6 +199,15 @@
         .btn-outline:active { transform: translateY(2px); background: #ffdb7c22; }
 
         .btn-small { padding: 8px 12px; font-size: 0.75rem; }
+
+        /* Botão de instalação PWA */
+        .pwa-install-btn {
+            margin: 0 0 18px;
+            background: linear-gradient(145deg, #ffe7a3, #d4a537);
+        }
+        .pwa-install-btn[hidden] {
+            display: none !important;
+        }
 
         .btn-danger {
             background: linear-gradient(145deg, #e05252, #b22222);
@@ -711,6 +725,10 @@
     <div class="controls">
         <h2>🃏 Th Card Maker</h2>
 
+        <button class="btn pwa-install-btn" id="installPwaBtn" type="button" hidden>
+            ⬇️ Instalar aplicativo
+        </button>
+
         <div class="control-group">
             <label>🏷️ Nome da carta</label>
             <input type="text" id="nameInput" placeholder="Ex: Dragão de Fogo" value="Dragão de Fogo">
@@ -930,6 +948,41 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Instalação PWA: o navegador só mostra o botão quando o site estiver elegível.
+        (function () {
+            const installButton = document.getElementById('installPwaBtn');
+            let deferredInstallPrompt = null;
+
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredInstallPrompt = event;
+                installButton.hidden = false;
+            });
+
+            installButton.addEventListener('click', async () => {
+                if (!deferredInstallPrompt) return;
+
+                deferredInstallPrompt.prompt();
+                await deferredInstallPrompt.userChoice;
+                deferredInstallPrompt = null;
+                installButton.hidden = true;
+            });
+
+            window.addEventListener('appinstalled', () => {
+                installButton.hidden = true;
+                deferredInstallPrompt = null;
+            });
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./service-worker.js')
+                        .catch(error => console.error('Falha ao registrar PWA:', error));
+                });
+            }
+        })();
+    </script>
 
     <script>
         (function() {
